@@ -1,0 +1,31 @@
+---
+- name: Ruby
+  hosts: all
+  vars:
+    ruby_version: "3.0.0"
+    rvm_path: "/usr/local/rvm/gems/ruby-{{ ruby_version }}/bin:/usr/local/rvm/gems/ruby-{{ ruby_version }}@global/bin:/usr/local/rvm/rubies/ruby-{{ ruby_version }}/bin:/usr/local/rvm/bin"
+  tasks:
+    - name: RVM repository
+      become: true
+      apt_repository:
+        repo: ppa:rael-gc/rvm
+
+    - name: RVM install
+      become: true
+      apt:
+        name: rvm
+        update_cache: true
+
+    - name: Add '{{ ansible_user }}' to RVM group
+      become: true
+      user:
+        name: '{{ ansible_user }}'
+        groups: rvm
+        append: yes
+
+    - name: Install ruby via rvm
+      command: "rvm install ruby-{{ ruby_version }}"
+      args:
+        creates: "/usr/share/rvm/rubies/ruby-{{ ruby_version }}"
+      environment:
+        PATH: "{{ rvm_path }}:{{ ansible_env.PATH }}"
