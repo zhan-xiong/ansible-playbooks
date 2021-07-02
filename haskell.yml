@@ -1,0 +1,10 @@
+---
+- name: Haskell
+  hosts: all
+  vars:
+  tasks:
+    - name: Haskell install
+      become: true
+      apt:
+        name: haskell-platform
+        update_cache: true
